@@ -21,4 +21,7 @@ public interface IProductService {
     public Product buyProduct(UUID id);
 
     public String deleteManyProducts(List<UUID> productIds);
+
+    public List<Product> searchProduct(String query);
+
 }
