@@ -50,6 +50,11 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User create(User user) {
+        System.out.println("Creating new user");
+        System.out.println(4324);
+        System.out.println(user.getEmail());
+        System.out.println(user.getPassword());
+
         Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent())
             throw new BadRequestException(String.format("User with email '%s' already exists", user.getEmail()));

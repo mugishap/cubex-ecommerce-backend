@@ -12,7 +12,6 @@ import com.cubex.ecommerce.v1.exceptions.BadRequestException;
 import com.cubex.ecommerce.v1.payload.ApiResponse;
 import com.cubex.ecommerce.v1.security.JwtTokenProvider;
 import com.cubex.ecommerce.v1.services.IFileService;
-import com.cubex.ecommerce.v1.services.IUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
