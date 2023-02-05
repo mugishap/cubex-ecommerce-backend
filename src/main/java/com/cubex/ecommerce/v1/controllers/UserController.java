@@ -6,6 +6,7 @@ import com.cubex.ecommerce.v1.fileHandling.FileStorageService;
 import com.cubex.ecommerce.v1.models.Role;
 import com.cubex.ecommerce.v1.models.User;
 import com.cubex.ecommerce.v1.repositories.IRoleRepository;
+import com.cubex.ecommerce.v1.serviceImpls.UserServiceImpl;
 import com.cubex.ecommerce.v1.utils.Constants;
 import com.cubex.ecommerce.v1.exceptions.BadRequestException;
 import com.cubex.ecommerce.v1.payload.ApiResponse;
@@ -35,7 +36,7 @@ import java.util.UUID;
 @RequestMapping(path = "/api/v1/users")
 public class UserController {
 
-    private final IUserService userService;
+    private final UserServiceImpl userService;
     private static final ModelMapper modelMapper = new ModelMapper();
     private final IRoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -47,7 +48,7 @@ public class UserController {
     private String directory;
 
     @Autowired
-    public UserController(IUserService userService, IRoleRepository roleRepository,
+    public UserController(UserServiceImpl userService, IRoleRepository roleRepository,
                           BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider,
                           FileStorageService fileStorageService, IFileService fileService) {
         this.userService = userService;

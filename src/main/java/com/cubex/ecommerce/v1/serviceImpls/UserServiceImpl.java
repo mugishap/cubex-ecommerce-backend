@@ -8,6 +8,7 @@ import com.cubex.ecommerce.v1.exceptions.ResourceNotFoundException;
 import com.cubex.ecommerce.v1.fileHandling.File;
 import com.cubex.ecommerce.v1.repositories.IUserRepository;
 import com.cubex.ecommerce.v1.services.IUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements IUserService {
 
     private final IUserRepository userRepository;

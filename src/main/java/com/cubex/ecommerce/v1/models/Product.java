@@ -16,7 +16,7 @@ import java.util.UUID;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column()
@@ -30,5 +30,8 @@ public class Product {
 
     @Column()
     private String image;
+
+    @Column(columnDefinition = "BOOLEAN DEFAULT false")
+    private Boolean isBought;
 
 }

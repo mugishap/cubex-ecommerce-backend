@@ -30,7 +30,6 @@ public class User extends TimestampAudit {
     @Column(name="id")
     private UUID id;
 
-
     @NotBlank
     @Column(name="email")
     private String email;

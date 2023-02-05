@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface IProductService {
 
-    public Product createProduct();
+    public Product createProduct(Product product);
 
     public Product updateProduct(Product product);
 
     public String deleteProduct(UUID id);
 
-    public Optional<Product> getProductById(UUID id);
+    public Product getProductById(UUID id);
 
     public List<Product> getProducts();
 
