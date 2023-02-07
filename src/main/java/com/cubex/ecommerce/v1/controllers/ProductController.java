@@ -52,9 +52,9 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductsPaginated(@RequestParam(value = "page", defaultValue = Constants.DEFAULT_PAGE_NUMBER) int page,
                                                             @RequestParam(value = "size", defaultValue = Constants.DEFAULT_PAGE_SIZE) int limit){
 
-        Pageable pageable = (Pageable) PageRequest.of(page,limit, Sort.Direction.ASC,"id")
+        Pageable pageable = (Pageable) PageRequest.of(page,limit, Sort.Direction.ASC,"id");
 
-        return ResponseEntity.ok().body(new ApiResponse(true,"Products fetched successfully",this.productService.getProductsPaginated()))
+        return ResponseEntity.ok().body(new ApiResponse(true,"Products fetched successfully",this.productService.getProductsPaginated(pageable)));
     }
 
     @GetMapping("/{id}")
@@ -74,7 +74,7 @@ public class ProductController {
 
     @DeleteMapping("/delete/multiple")
     public ResponseEntity<ApiResponse> deleteManyProducts(@RequestBody DeleteManyProductsDTO dto) {
-        return ResponseEntity.ok().body(new ApiResponse(true, "Products deleted successfully", this.productService.deleteManyProducts(dto.getProductIds()));
+        return ResponseEntity.ok().body(new ApiResponse(true, "Products deleted successfully", this.productService.deleteManyProducts(dto.getProductIds())));
     }
 
     @DeleteMapping("/truncate")

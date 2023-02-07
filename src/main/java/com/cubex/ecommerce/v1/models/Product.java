@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -25,7 +26,7 @@ public class Product {
     @Column()
     private int price;
 
-    @Column()
+    @Column(columnDefinition = "VARCHAR(5) DEFAULT 'USD'")
     private String currency;
 
     @Column()
@@ -33,5 +34,18 @@ public class Product {
 
     @Column(columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isBought;
+
+    @ManyToMany()
+    private List<Cart> carts;
+
+    @ManyToMany()
+    private List<Purchase> purchases;
+
+    public Product(String name, String image, String currency, int price) {
+        this.name = name;
+        this.currency = currency;
+        this.image = image;
+        this.price = price;
+    }
 
 }

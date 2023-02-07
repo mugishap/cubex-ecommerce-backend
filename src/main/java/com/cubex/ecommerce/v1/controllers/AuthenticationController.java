@@ -67,7 +67,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-    @PostMapping(path = "/initiate-reset-password")
+    @PostMapping("/initiate-reset-password")
     public ResponseEntity<ApiResponse> initiateResetPassword(@RequestBody @Valid InitiatePasswordDTO dto) {
         User user = this.userService.getByEmail(dto.getEmail());
         user.setActivationCode(Utility.randomUUID(6, 0, 'N'));

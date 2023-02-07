@@ -18,7 +18,7 @@ public class SignUpDTO {
     @NotBlank
     private  String firstName;
 
-    @NotBlank
+    @NotBlank(message = "last name should not be null")
     private  String lastName;
 
     @NotBlank

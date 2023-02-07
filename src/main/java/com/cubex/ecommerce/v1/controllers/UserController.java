@@ -3,6 +3,7 @@ package com.cubex.ecommerce.v1.controllers;
 import com.cubex.ecommerce.v1.dtos.SignUpDTO;
 import com.cubex.ecommerce.v1.fileHandling.File;
 import com.cubex.ecommerce.v1.fileHandling.FileStorageService;
+import com.cubex.ecommerce.v1.models.Cart;
 import com.cubex.ecommerce.v1.models.Role;
 import com.cubex.ecommerce.v1.models.User;
 import com.cubex.ecommerce.v1.repositories.IRoleRepository;
@@ -99,6 +100,9 @@ public class UserController {
         user.setRoles(Collections.singleton(role));
 
         User entity = this.userService.create(user);
+
+        Cart userCart = new Cart(entity);
+
 
         return ResponseEntity.ok(new ApiResponse(true, entity));
     }

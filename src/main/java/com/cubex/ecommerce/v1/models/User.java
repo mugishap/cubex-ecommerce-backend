@@ -12,6 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,13 +31,15 @@ public class User extends TimestampAudit {
     @Column(name="id")
     private UUID id;
 
-    @NotBlank
+    @NotBlank(message = "Email is mandatory")
     @Column(name="email")
     private String email;
 
+    @NotBlank(message = "First name is mandatory")
     @Column(name="first_name")
     private String firstName;
 
+    @NotBlank(message = "Last name is mandatory")
     @Column(name="last_name")
     private String lastName;
 
@@ -44,7 +47,7 @@ public class User extends TimestampAudit {
     private String mobile;
 
     @JsonIgnore
-    @NotBlank
+    @NotBlank(message = "Password is mandatory")
     @Column(name="password")
     private String password;
 
@@ -65,7 +68,11 @@ public class User extends TimestampAudit {
     @Column(name="activation_code")
     private String activationCode;
 
+    @OneToMany()
+    private List<Purchase> purchases;
 
+    @OneToOne()
+    private Cart cart;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
