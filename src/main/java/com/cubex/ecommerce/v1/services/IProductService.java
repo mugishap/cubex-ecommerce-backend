@@ -1,6 +1,7 @@
 package com.cubex.ecommerce.v1.services;
 
 import com.cubex.ecommerce.v1.dtos.CreateProductDTO;
+import com.cubex.ecommerce.v1.models.Cart;
 import com.cubex.ecommerce.v1.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,5 +31,15 @@ public interface IProductService {
     public String truncate();
 
     public Page<Product> getProductsPaginated(Pageable pageable);
+
+    public Cart addProductToCart(Product product, Cart cart);
+
+    public Cart addMultipleProductsToCart(List<Product> products, Cart cart);
+
+    public Cart removeProductFromCart(UUID productID, Cart cart);
+
+    public Cart emptyCart();
+
+    public Cart removeMultipleItemsFromCart(List<UUID> productIds);
 
 }

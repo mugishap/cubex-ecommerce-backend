@@ -81,4 +81,5 @@ public class ProductController {
     public ResponseEntity<ApiResponse> deleteAllProducts(@RequestBody AdminConfirmationDTO dto){
         return ResponseEntity.ok().body(new ApiResponse(true, this.productService.truncate()));
     }
+
 }

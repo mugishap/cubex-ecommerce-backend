@@ -64,7 +64,6 @@ public class User extends TimestampAudit {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private File profileImage;
 
-
     @Column(name="activation_code")
     private String activationCode;
 

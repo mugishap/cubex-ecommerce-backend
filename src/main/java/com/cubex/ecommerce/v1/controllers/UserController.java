@@ -43,7 +43,7 @@ public class UserController {
     private final JwtTokenProvider jwtTokenProvider;
     private final FileStorageService fileStorageService;
     private final IFileService fileService;
-
+    
     @Value("${uploads.directory.user_profiles}")
     private String directory;
 
