@@ -6,6 +6,7 @@ import com.cubex.ecommerce.v1.enums.EGender;
 import com.cubex.ecommerce.v1.enums.EUserStatus;
 import com.cubex.ecommerce.v1.fileHandling.File;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -27,7 +28,8 @@ import java.util.UUID;
 @Table(name="users", uniqueConstraints = { @UniqueConstraint(columnNames={ "email" }), @UniqueConstraint(columnNames={ "mobile" })})
 public class User extends TimestampAudit {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2",strategy = "uuid2")
     @Column(name="id")
     private UUID id;
 
@@ -52,7 +54,7 @@ public class User extends TimestampAudit {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="gendder")
+    @Column(name="gender")
     private EGender gender;
 
     @Enumerated(EnumType.STRING)

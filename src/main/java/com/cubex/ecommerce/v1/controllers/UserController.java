@@ -6,7 +6,9 @@ import com.cubex.ecommerce.v1.fileHandling.FileStorageService;
 import com.cubex.ecommerce.v1.models.Cart;
 import com.cubex.ecommerce.v1.models.Role;
 import com.cubex.ecommerce.v1.models.User;
+import com.cubex.ecommerce.v1.repositories.ICartRepository;
 import com.cubex.ecommerce.v1.repositories.IRoleRepository;
+import com.cubex.ecommerce.v1.repositories.IUserRepository;
 import com.cubex.ecommerce.v1.serviceImpls.UserServiceImpl;
 import com.cubex.ecommerce.v1.utils.Constants;
 import com.cubex.ecommerce.v1.exceptions.BadRequestException;
@@ -26,10 +28,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -37,31 +42,35 @@ import java.util.UUID;
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final IUserRepository userRepository;
     private static final ModelMapper modelMapper = new ModelMapper();
     private final IRoleRepository roleRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final FileStorageService fileStorageService;
     private final IFileService fileService;
-    
+    private final ICartRepository cartRepository;
+
     @Value("${uploads.directory.user_profiles}")
     private String directory;
 
     @Autowired
-    public UserController(UserServiceImpl userService, IRoleRepository roleRepository,
+    public UserController(UserServiceImpl userService, IUserRepository userRepository, IRoleRepository roleRepository,
                           BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider,
-                          FileStorageService fileStorageService, IFileService fileService) {
+                          FileStorageService fileStorageService, IFileService fileService, ICartRepository cartRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.fileService = fileService;
         this.fileStorageService = fileStorageService;
+        this.cartRepository = cartRepository;
     }
 
     @GetMapping(path = "/current-user")
-    public ResponseEntity<ApiResponse> currentlyLoggedInUser(){
-        return ResponseEntity.ok(new ApiResponse(true,  userService.getLoggedInUser()));
+    public ResponseEntity<ApiResponse> currentlyLoggedInUser() {
+        return ResponseEntity.ok(new ApiResponse(true, userService.getLoggedInUser()));
     }
 
     @GetMapping
@@ -69,7 +78,7 @@ public class UserController {
         return this.userService.getAll();
     }
 
-    @GetMapping(path="/paginated")
+    @GetMapping(path = "/paginated")
     public Page<User> getAllUsers(@RequestParam(value = "page", defaultValue = Constants.DEFAULT_PAGE_NUMBER) int page,
                                   @RequestParam(value = "size", defaultValue = Constants.DEFAULT_PAGE_SIZE) int limit
     ) {
@@ -77,19 +86,30 @@ public class UserController {
         return userService.getAll(pageable);
     }
 
-    @GetMapping(path="/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<User> getById(@PathVariable(value = "id") UUID id) {
         return ResponseEntity.ok(this.userService.getById(id));
     }
 
     @PostMapping(path = "/register")
-    public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto){
-
+    public ResponseEntity<ApiResponse> register(@RequestBody @Valid SignUpDTO dto) {
         User user = new User();
 
+        Optional<User> otherUser = this.userRepository.findByEmailOrMobile(user.getEmail(), dto.getMobile());
+        if (otherUser.isPresent()) {
+            if (otherUser.get().getEmail().equals(dto.getEmail())) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that email already exists"));
+            } else if (otherUser.get().getMobile().equals(dto.getMobile())) {
+                return ResponseEntity.badRequest().body(new ApiResponse(false, "User with that telephone already exists"));
+            }
+        }
+
         String encodedPassword = bCryptPasswordEncoder.encode(dto.getPassword());
+
         Role role = roleRepository.findByName(dto.getRole()).orElseThrow(
-                ()-> new BadRequestException("User Role not set"));
+                () -> new BadRequestException("User Role not set"));
+
+        System.out.println("Before Setting");
 
         user.setEmail(dto.getEmail());
         user.setFirstName(dto.getFirstName());
@@ -99,15 +119,17 @@ public class UserController {
         user.setPassword(encodedPassword);
         user.setRoles(Collections.singleton(role));
 
+        System.out.println("After setters");
+
         User entity = this.userService.create(user);
 
         Cart userCart = new Cart(entity);
-
-
-        return ResponseEntity.ok(new ApiResponse(true, entity));
+        this.cartRepository.save(userCart);
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/users/create").toString());
+        return ResponseEntity.created(uri).body(new ApiResponse(true, entity));
     }
 
-    @PutMapping(path="/{id}/upload-profile")
+    @PutMapping(path = "/{id}/upload-profile")
     public ResponseEntity<ApiResponse> uploadProfileImage(
             @PathVariable(value = "id") UUID id,
             @RequestParam("file") MultipartFile document

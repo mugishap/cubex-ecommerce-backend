@@ -16,16 +16,16 @@ import java.util.UUID;
 @Table(name = "roles")
 public class Role {
     @Id
-    @GeneratedValue(generator = "userUUID")
-    @GenericGenerator(name="userUUID", strategy="org.hibernate.id.UUIDGenerator")
-    @Column(name="id")
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2",strategy = "uuid2")
+    @Column(name = "id")
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name="name")
+    @Column(name = "name")
     private ERole name;
 
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
 
     public Role(ERole name, String description) {
