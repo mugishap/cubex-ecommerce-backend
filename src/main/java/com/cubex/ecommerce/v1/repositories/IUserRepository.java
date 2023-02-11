@@ -15,6 +15,7 @@ public interface IUserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findById(UUID userID);
 
+    @Query("SELECT u FROM User u WHERE u.email=:email")
     Optional<User> findByEmail(String email);
 
     Optional<User> findByEmailOrMobile(String email, String mobile);

@@ -109,8 +109,6 @@ public class UserController {
         Role role = roleRepository.findByName(dto.getRole()).orElseThrow(
                 () -> new BadRequestException("User Role not set"));
 
-        System.out.println("Before Setting");
-
         user.setEmail(dto.getEmail());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
@@ -118,8 +116,6 @@ public class UserController {
         user.setMobile(dto.getMobile());
         user.setPassword(encodedPassword);
         user.setRoles(Collections.singleton(role));
-
-        System.out.println("After setters");
 
         User entity = this.userService.create(user);
 

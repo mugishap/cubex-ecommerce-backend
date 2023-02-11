@@ -5,6 +5,7 @@ import com.cubex.ecommerce.v1.dtos.ResetPasswordDTO;
 import com.cubex.ecommerce.v1.dtos.SignInDTO;
 import com.cubex.ecommerce.v1.enums.EUserStatus;
 import com.cubex.ecommerce.v1.models.User;
+import com.cubex.ecommerce.v1.repositories.IUserRepository;
 import com.cubex.ecommerce.v1.utils.Utility;
 import com.cubex.ecommerce.v1.exceptions.AppException;
 import com.cubex.ecommerce.v1.payload.ApiResponse;
@@ -35,16 +36,18 @@ public class AuthenticationController {
     private final JwtTokenProvider jwtTokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MailService mailService;
+    private final IUserRepository userRepository;
 
     @Autowired
     public AuthenticationController(IUserService userService, AuthenticationManager authenticationManager,
                                     JwtTokenProvider jwtTokenProvider, MailService mailService,
-                                    BCryptPasswordEncoder bCryptPasswordEncoder) {
+                                    BCryptPasswordEncoder bCryptPasswordEncoder, IUserRepository userRepository) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.mailService = mailService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userRepository = userRepository;
     }
 
 
@@ -69,11 +72,8 @@ public class AuthenticationController {
 
     @PostMapping("/initiate-reset-password")
     public ResponseEntity<ApiResponse> initiateResetPassword(@RequestBody @Valid InitiatePasswordDTO dto) {
-        User user = this.userService.getByEmail(dto.getEmail());
-        user.setActivationCode(Utility.randomUUID(6, 0, 'N'));
-        user.setStatus(EUserStatus.RESET);
 
-        this.userService.create(user);
+        User user = this.userService.initiateResetPassword(dto.getEmail());
 
         mailService.sendResetPasswordMail(user.getEmail(), user.getFirstName() + " " + user.getLastName(), user.getActivationCode());
 
@@ -84,7 +84,7 @@ public class AuthenticationController {
     @PostMapping(path = "/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody @Valid ResetPasswordDTO dto) {
         User user = this.userService.getByEmail(dto.getEmail());
-
+        System.out.println(user.getActivationCode());
         if (Utility.isCodeValid(user.getActivationCode(), dto.getActivationCode()) &&
                 (user.getStatus().equals(EUserStatus.RESET)) || user.getStatus().equals(EUserStatus.PENDING)) {
             user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));

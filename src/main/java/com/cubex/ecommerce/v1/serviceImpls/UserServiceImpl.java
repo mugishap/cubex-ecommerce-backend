@@ -8,6 +8,7 @@ import com.cubex.ecommerce.v1.exceptions.ResourceNotFoundException;
 import com.cubex.ecommerce.v1.fileHandling.File;
 import com.cubex.ecommerce.v1.repositories.IUserRepository;
 import com.cubex.ecommerce.v1.services.IUserService;
+import com.cubex.ecommerce.v1.utils.Utility;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +40,20 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public User initiateResetPassword(String email) {
+        User user = this.userRepository.findByEmail(email).
+                orElseThrow(() ->
+                        new UsernameNotFoundException("User with email " + email + " was not found"));
+        System.out.println(user.getEmail());
+        user.setActivationCode(Utility.randomUUID(6, 0, 'N'));
+        user.setStatus(EUserStatus.RESET);
+        System.out.println("User from service => " + user);
+//        this.userRepository.save(user);
+        System.out.println("Testing email sending");
+        return user;
+    }
+
+    @Override
     public Page<User> getAll(Pageable pageable) {
         return this.userRepository.findAll(pageable);
     }
@@ -50,11 +66,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User create(User user) {
-        System.out.println("Creating new user");
-        System.out.println(4324);
-        System.out.println(user.getEmail());
-        System.out.println(user.getPassword());
-
         Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent())
             throw new BadRequestException(String.format("User with email '%s' already exists", user.getEmail()));
@@ -65,7 +76,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User update(UUID id, User user) {
         User entity = this.userRepository.findById(id).orElseThrow(
-                () ->  new ResourceNotFoundException("User", "id", id.toString()));
+                () -> new ResourceNotFoundException("User", "id", id.toString()));
 
         Optional<User> userOptional = this.userRepository.findByEmail(user.getEmail());
         if (userOptional.isPresent() && (userOptional.get().getId() != entity.getId()))
@@ -115,9 +126,9 @@ public class UserServiceImpl implements IUserService {
         String email;
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(principal instanceof UserDetails){
+        if (principal instanceof UserDetails) {
             email = ((UserDetails) principal).getUsername();
-        }else{
+        } else {
             email = principal.toString();
         }
 
@@ -132,24 +143,23 @@ public class UserServiceImpl implements IUserService {
     }
 
 
-
     @Override
     public User changeStatus(UUID id, EUserStatus status) {
         User entity = this.userRepository.findById(id).orElseThrow(
-                () ->  new ResourceNotFoundException("User", "id", id.toString()));
+                () -> new ResourceNotFoundException("User", "id", id.toString()));
 
         entity.setStatus(status);
 
-        return  this.userRepository.save(entity);
+        return this.userRepository.save(entity);
     }
 
     @Override
     public User changeProfileImage(UUID id, File file) {
         User entity = this.userRepository.findById(id).orElseThrow(
-                () ->  new ResourceNotFoundException("Document", "id", id.toString()));
+                () -> new ResourceNotFoundException("Document", "id", id.toString()));
 
         entity.setProfileImage(file);
-        return  this.userRepository.save(entity);
+        return this.userRepository.save(entity);
 
     }
 }

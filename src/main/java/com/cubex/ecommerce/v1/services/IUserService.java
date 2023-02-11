@@ -16,6 +16,8 @@ public interface IUserService {
 
     public List<User> getAll();
 
+    public User initiateResetPassword(String email);
+
     public Page<User> getAll(Pageable pageable);
 
     public User getById(UUID id);
